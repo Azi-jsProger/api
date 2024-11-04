@@ -4,16 +4,16 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 8888;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Подключение к MongoDB
-mongoose.connect(process.env.MONGO_URI, { 
-    useNewUrlParser: true, 
-    useUnifiedTopology: true 
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
 })
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.error('MongoDB connection error:', err));
@@ -43,7 +43,7 @@ app.post('/api/items', async (req, res) => {
     const { name, value } = req.body;
 
     const newItem = new Item({ name, value });
-    
+
     try {
         await newItem.save();
         res.status(201).json(newItem);
