@@ -35,3 +35,4 @@ async function fetchItems() {
 // Вызов функций
 getItems();
 fetchItems();
+console.log('Error');
