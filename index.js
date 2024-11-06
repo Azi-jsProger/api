@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8888;
 
 // Middleware
 app.use(cors());
@@ -13,7 +13,8 @@ app.use(express.json());
 // Подключение к MongoDB
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    connectTimeoutMS: 10000,  // Устанавливаем тайм-аут на подключение
 })
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.error('MongoDB connection error:', err));
@@ -23,6 +24,9 @@ const itemSchema = new mongoose.Schema({
     name: { type: String, required: true },
     value: { type: Number, required: true }
 });
+
+// Добавим индекс для поля 'name' для ускорения поиска
+itemSchema.index({ name: 1 });
 
 const Item = mongoose.model('Item', itemSchema);
 
