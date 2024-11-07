@@ -4,20 +4,17 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 8888;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Подключение к MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    connectTimeoutMS: 10000,  // Устанавливаем тайм-аут на подключение
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => {
+        console.error('MongoDB connection error:', err);
+    });
 
 // Определение схемы и модели
 const itemSchema = new mongoose.Schema({
@@ -25,14 +22,9 @@ const itemSchema = new mongoose.Schema({
     value: { type: Number, required: true }
 });
 
-// Добавим индекс для поля 'name' для ускорения поиска
-itemSchema.index({ name: 1 });
-
 const Item = mongoose.model('Item', itemSchema);
 
 // CRUD операции
-
-// Получить все элементы
 app.get('/api/items', async (req, res) => {
     try {
         const items = await Item.find();
@@ -42,24 +34,22 @@ app.get('/api/items', async (req, res) => {
     }
 });
 
-// Добавить новый элемент
 app.post('/api/items', async (req, res) => {
     const { name, value } = req.body;
-
+    if (!name || !value) {
+        return res.status(400).json({ message: 'Name and value are required' });
+    }
     const newItem = new Item({ name, value });
-
     try {
         await newItem.save();
         res.status(201).json(newItem);
     } catch (err) {
-        res.status(400).json({ message: 'Error saving item' });
+        res.status(500).json({ message: 'Error saving item' });
     }
 });
 
-// Удалить элемент
 app.delete('/api/items/:id', async (req, res) => {
     const { id } = req.params;
-
     try {
         const item = await Item.findByIdAndDelete(id);
         if (!item) return res.status(404).json({ message: 'Item not found' });
@@ -69,7 +59,5 @@ app.delete('/api/items/:id', async (req, res) => {
     }
 });
 
-// Запуск сервера
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+// Экспортируем обработчик для Vercel
+module.exports = app;
