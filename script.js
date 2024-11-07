@@ -1,3 +1,4 @@
+// Функция для добавления нового элемента
 async function getItems() {
     try {
         const response = await fetch('https://api-rho-smoky.vercel.app/api/items', {
@@ -19,6 +20,7 @@ async function getItems() {
     }
 }
 
+// Функция для получения всех элементов
 async function fetchItems() {
     try {
         const response = await fetch('https://api-rho-smoky.vercel.app/api/items');
@@ -33,6 +35,6 @@ async function fetchItems() {
 }
 
 // Вызов функций
-getItems();
-fetchItems();
-console.log('Error');
+getItems(); // Добавляем новый элемент
+fetchItems(); // Получаем все элементы
+console.log('Request made');
